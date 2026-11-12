@@ -1,0 +1,12 @@
+{
+  "name": "idcard-studio",
+  "version": "1.0.0",
+  "description": "ID Card Studio — generator ID Card pegawai dari template asli (web app statis, tanpa backend)",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/engine.test.js tests/kabupaten.test.js tests/store.test.js",
+    "serve": "python3 -m http.server 8080"
+  },
+  "license": "MIT"
+}

@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="id" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>PRINTLAY — Smart Print Layout Calculator</title>
+  <meta name="description" content="Hitung jumlah maksimal desain per lembar kertas, lihat simulasi layout dengan garis potong, dan unduh PDF siap cetak. Semua diproses lokal di browser.">
+  <link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
+  <script>
+    try {
+      var s = JSON.parse(localStorage.getItem('printlay.settings.v1') || 'null');
+      var t = s && s.theme ? s.theme : (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', t);
+    } catch (e) {}
+  </script>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/responsive.css">
+  <link rel="stylesheet" href="../../assets/css/global.css"></head>
+<body>
+  
+
+  <dialog id="settingsDialog">
+    <form method="dialog" class="dialog-body">
+      <h2>Pengaturan</h2>
+      <label class="check"><input type="checkbox" id="persistArtwork"> Ingat artwork di browser ini (IndexedDB, hanya lokal)</label>
+      <button type="button" class="btn" id="resetSettingsBtn">Reset pengaturan ke bawaan</button>
+      <button type="button" class="btn" data-action="clear-history">Hapus riwayat perhitungan</button>
+      <p class="muted small">Seluruh data tersimpan hanya di perangkat Anda. Tidak ada gambar atau data yang dikirim ke server.</p>
+      <button class="btn primary" value="close">Tutup</button>
+    </form>
+  </dialog>
+
+  <main class="layout">
+    <section class="panel" aria-label="Pengaturan layout">
+      <div id="formErrors" class="alert error" role="alert" hidden></div>
+
+      <div class="card">
+        <h2>Template</h2>
+        <label>Jenis
+          <select id="templateSel">
+            <option value="std">Standar (1 desain, ukuran bebas)</option>
+            <option value="polaroid2r">Polaroid 2R (2,5 × 3,5 inch)</option>
+            <option value="batch">Foto Kustom (impor hingga 100 foto, ukuran bebas)</option>
+          </select>
+        </label>
+        <div id="polaroidOpts" hidden>
+          <div class="row center">
+            <label class="radio"><input type="radio" name="cardOrient" id="cardAuto" value="auto" checked> Otomatis (ikut foto)</label>
+            <label class="radio"><input type="radio" name="cardOrient" id="cardPortrait" value="portrait"> Potret</label>
+            <label class="radio"><input type="radio" name="cardOrient" id="cardLandscape" value="landscape"> Lanskap</label>
+          </div>
+          <div id="polaroidBorders">
+          <div class="row three">
+            <label>Border samping (mm) <input id="pSide" inputmode="decimal" autocomplete="off"></label>
+            <label>Border atas (mm) <input id="pTop" inputmode="decimal" autocomplete="off"></label>
+            <label>Border bawah (mm) <input id="pBottom" inputmode="decimal" autocomplete="off"></label>
+          </div>
+          </div>
+          <p id="polaroidInfo" class="muted small"></p>
+          <p class="muted small">Foto di-zoom hingga memenuhi kotak lalu dipotong di tepinya (cover). Rasio foto tidak pernah diregangkan. Geser &amp; zoom tiap foto langsung di preview.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Ukuran Desain</h2>
+        <div class="row">
+          <label>Lebar <input id="designW" inputmode="decimal" autocomplete="off"></label>
+          <button type="button" id="swapDesign" class="icon-btn small" aria-label="Tukar lebar dan tinggi" title="Tukar">⇄</button>
+          <label>Tinggi <input id="designH" inputmode="decimal" autocomplete="off"></label>
+          <label>Satuan
+            <select id="designUnit"><option value="mm">mm</option><option value="cm">cm</option><option value="in">inch</option></select>
+          </label>
+        </div>
+        <label>Jumlah pesanan (opsional) <input id="qty" inputmode="numeric" placeholder="mis. 100" autocomplete="off"></label>
+        <p id="designInfo" class="muted small"></p>
+      </div>
+
+      <div class="card">
+        <h2>Ukuran Kertas</h2>
+        <label>Preset <select id="paperPreset"></select></label>
+        <div class="row">
+          <label>Lebar (mm) <input id="paperW" inputmode="decimal" autocomplete="off"></label>
+          <label>Tinggi (mm) <input id="paperH" inputmode="decimal" autocomplete="off"></label>
+        </div>
+        <div class="row center">
+          <label class="radio"><input type="radio" name="orientation" id="orientPortrait" value="portrait" checked> Portrait</label>
+          <label class="radio"><input type="radio" name="orientation" id="orientLandscape" value="landscape"> Landscape</label>
+          <button type="button" id="swapPaper" class="btn small">⇄ Putar kertas</button>
+        </div>
+        <p id="paperInfo" class="muted small"></p>
+      </div>
+
+      <div class="card">
+        <h2>Gap &amp; Margin</h2>
+        <div class="row">
+          <label>Gap horizontal (mm) <input id="gapX" inputmode="decimal" autocomplete="off"></label>
+          <label>Gap vertikal (mm) <input id="gapY" inputmode="decimal" autocomplete="off"></label>
+        </div>
+        <div class="row four">
+          <label>Atas <input id="mTop" inputmode="decimal" autocomplete="off"></label>
+          <label>Kanan <input id="mRight" inputmode="decimal" autocomplete="off"></label>
+          <label>Bawah <input id="mBottom" inputmode="decimal" autocomplete="off"></label>
+          <label>Kiri <input id="mLeft" inputmode="decimal" autocomplete="off"></label>
+        </div>
+        <p class="muted small">Margin dalam mm. Gap hanya di antara desain, bukan di tepi kertas.</p>
+        <label class="check"><input type="checkbox" id="allowRotation" checked> Rotasi otomatis 90°</label>
+        <label class="check"><input type="checkbox" id="extendedSearch" checked> Pencarian menyeluruh (MaxRects, 5 heuristik)</label>
+      </div>
+
+      <div class="card">
+        <h2>Artwork Asli</h2>
+        <div id="dropzone" class="dropzone" tabindex="0" role="button" aria-label="Unggah artwork: seret file ke sini atau tekan untuk memilih">
+          <p id="dzMain"><strong>Seret &amp; lepas gambar</strong> atau <u>pilih file</u></p>
+          <p class="muted small">PNG, JPG, JPEG, WebP, SVG · diproses lokal di browser</p>
+        </div>
+        <input type="file" id="fileInput" accept="image/png,image/jpeg,image/webp,image/svg+xml,.png,.jpg,.jpeg,.webp,.svg" hidden>
+        <div id="artBox" hidden>
+          <div class="art-row">
+            <img id="artThumb" alt="Pratinjau artwork" class="thumb">
+            <div id="artInfo" class="art-info"></div>
+          </div>
+          <div class="row">
+            <button type="button" class="btn small" id="replaceBtn">Ganti gambar</button>
+            <button type="button" class="btn small danger" id="removeBtn">Hapus gambar</button>
+          </div>
+          <div class="row center">
+            <label class="radio"><input type="radio" name="fit" value="contain" checked> Contain</label>
+            <label class="radio"><input type="radio" name="fit" value="cover"> Cover (potong)</label>
+          </div>
+          <p id="fitNote" class="muted small" hidden>Template aktif: foto selalu di-zoom (cover) mengikuti kotak foto.</p>
+          <div id="artWarnings"></div>
+        </div>
+        <div id="photoBox" hidden>
+          <div id="photoGrid" class="photo-grid" aria-label="Daftar foto"></div>
+          <p id="photoSummary" class="muted small"></p>
+          <div class="row wrap">
+            <button type="button" class="btn small" id="addPhotosBtn">+ Tambah foto</button>
+            <button type="button" class="btn small danger" id="clearPhotosBtn">Hapus semua</button>
+          </div>
+          <div id="photoEditor" class="photo-editor" hidden>
+            <div id="photoMeta" class="small"></div>
+            <label>Zoom <span id="photoZoomVal" class="muted"></span>
+              <input type="range" id="photoZoom" min="100" max="500" step="1" value="100" aria-label="Zoom foto terpilih">
+            </label>
+            <div class="row wrap">
+              <button type="button" class="btn small" id="photoReset">Reset posisi &amp; zoom</button>
+              <button type="button" class="btn small" id="photoEarlier" aria-label="Majukan urutan">◀</button>
+              <button type="button" class="btn small" id="photoLater" aria-label="Mundurkan urutan">▶</button>
+              <button type="button" class="btn small danger" id="photoRemove">Hapus foto</button>
+            </div>
+            <div id="photoWarn"></div>
+          </div>
+        </div>
+        <div id="artError" class="alert error" role="alert" hidden></div>
+        <p id="placeholderNote" class="muted small">Belum ada artwork: desain ditampilkan sebagai placeholder biru muda (hanya simulasi layout).</p>
+      </div>
+
+      <button type="button" id="calcBtn" class="btn primary big">CALCULATE</button>
+    </section>
+
+    <section class="output" aria-label="Hasil">
+      <div class="card" id="resultCard">
+        <div class="result-head">
+          <h2>Hasil</h2>
+          <span id="statusBadge" class="badge neutral">Belum dihitung</span>
+        </div>
+        <div class="hero"><span id="rCount">–</span><small>pcs per lembar</small></div>
+        <div class="stats">
+          <div class="stat"><span class="k">Kertas</span><span class="v" id="rPaper">–</span></div>
+          <div class="stat"><span class="k">Ukuran desain</span><span class="v" id="rDesign">–</span></div>
+          <div class="stat"><span class="k">Gap H / V</span><span class="v" id="rGap">–</span></div>
+          <div class="stat"><span class="k">Margin (A/K/B/Ki)</span><span class="v" id="rMargin">–</span></div>
+          <div class="stat"><span class="k">Orientasi desain</span><span class="v" id="rOrient">–</span></div>
+          <div class="stat"><span class="k">Normal / Dirotasi</span><span class="v"><span id="rNormal">–</span> / <span id="rRotated">–</span></span></div>
+          <div class="stat"><span class="k">Area terpakai</span><span class="v" id="rUtil">–</span></div>
+          <div class="stat"><span class="k">Sisa kertas</span><span class="v" id="rWaste">–</span></div>
+          <div class="stat wide"><span class="k">Strategi</span><span class="v" id="rStrategy">–</span></div>
+        </div>
+        <p id="rNote" class="muted small"></p>
+        <ul id="rChecks" class="checks"></ul>
+        <div id="orderBox" class="order" hidden>
+          <h3>Kebutuhan pesanan</h3>
+          <div class="stats">
+            <div class="stat"><span class="k">Jumlah lembar</span><span class="v" id="oSheets">–</span></div>
+            <div class="stat"><span class="k">Total desain tercetak</span><span class="v" id="oTotal">–</span></div>
+            <div class="stat"><span class="k">Kelebihan cetak</span><span class="v" id="oSpare">–</span></div>
+            <div class="stat"><span class="k">Lembar terakhir</span><span class="v" id="oLast">–</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="toolbar">
+          <h2>Preview</h2>
+          <div class="toolbar-group">
+            <span id="sheetNav" class="toolbar-group" hidden>
+              <button type="button" id="sheetPrev" class="icon-btn small" aria-label="Lembar sebelumnya">‹</button>
+              <span id="sheetLabel" class="zoom-label"></span>
+              <button type="button" id="sheetNext" class="icon-btn small" aria-label="Lembar berikutnya">›</button>
+            </span>
+            <button type="button" id="zoomOut" class="icon-btn small" aria-label="Zoom out">−</button>
+            <span id="zoomLabel" class="zoom-label">100%</span>
+            <button type="button" id="zoomIn" class="icon-btn small" aria-label="Zoom in">+</button>
+            <button type="button" id="zoomFit" class="btn small">Fit</button>
+          </div>
+        </div>
+        <div class="toggles">
+          <label class="check"><input type="checkbox" id="showNumbers" checked> Nomor</label>
+          <label class="check"><input type="checkbox" id="showMargin" checked> Margin</label>
+          <label class="check"><input type="checkbox" id="showDims"> Ukuran</label>
+        </div>
+        <p id="adjustHint" class="muted small" hidden>Seret foto untuk menggeser · scroll / cubit untuk zoom · klik foto untuk memilihnya.</p>
+        <div id="placeholderBadge" class="alert info" hidden>Placeholder — belum ada artwork. Biru muda hanya untuk simulasi layout, bukan desain final.</div>
+        <div id="previewWrap" class="preview-wrap">
+          <div id="previewHost"><p class="muted empty">Tekan CALCULATE untuk melihat simulasi layout.</p></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Export</h2>
+        <div class="row wrap">
+          <button type="button" id="btnPreview" class="btn">Preview Layout</button>
+          <button type="button" id="btnPdf" class="btn primary" disabled>Download PDF</button>
+          <button type="button" id="btnSvg" class="btn" disabled>Download SVG</button>
+          <button type="button" id="btnPrint" class="btn" disabled>Print</button>
+        </div>
+        <label class="check"><input type="checkbox" id="exportNumbers"> Sertakan nomor desain pada export/print</label>
+        <p id="exportMsg" class="small" role="status"></p>
+        <p class="alert info small" id="printNote">Cetak PDF dengan pengaturan <strong>Actual Size / 100%</strong>, bukan <em>Fit to Page</em>, agar skala tetap 1:1. Ukuran halaman PDF sama dengan ukuran kertas yang dipilih.</p>
+      </div>
+
+      <div class="card">
+        <div class="toolbar">
+          <h2>Riwayat</h2>
+          <button type="button" class="btn small" data-action="clear-history">Hapus riwayat</button>
+        </div>
+        <ul id="historyList" class="history"></ul>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer muted small">PRINTLAY · diproses 100% di browser Anda · hasil MaxRects adalah heuristik, bukan klaim optimum global kecuali dinyatakan terbukti.</footer>
+
+  <script src="assets/js/vendor/jspdf.umd.min.js"></script>
+  <script type="module" src="assets/js/app.js"></script>
+  <script src="../../assets/js/platform.js"></script></body>
+</html>

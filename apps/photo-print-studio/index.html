@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="id" data-bs-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PHOTO PRINT STUDIO — KRISNA DIGITAL</title>
+<meta name="description" content="Professional Photo Layout & Print Studio — KRISNA DIGITAL">
+<meta name="theme-color" content="#070b14">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link href="vendor/bootstrap.min.css" rel="stylesheet">
+<link href="styles.css" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/global.css"></head>
+<body data-theme="dark">
+<div class="app" id="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <img src="assets/favicon.svg" alt="" class="brand-logo">
+      <div><div class="brand-name">PHOTO PRINT STUDIO</div><div class="brand-sub">KRISNA DIGITAL</div></div>
+    </div>
+    <nav class="nav-list" id="nav" aria-label="Navigasi utama"></nav>
+    <div class="side-foot">Professional Photo Layout &amp; Print Studio<br><span id="app-version"></span></div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar kd-legacy-actions"><button class="btn btn-sm btn-primary" id="btn-save" title="Simpan sekarang (Ctrl+S)"><i data-lucide="save"></i><span class="d-none d-md-inline"> Simpan</span></button></header>
+
+    <main class="content" id="content">
+      <section class="view active" id="view-projects" aria-label="Proyek"></section>
+      <section class="view" id="view-people" aria-label="Orang dan foto"></section>
+      <section class="view view-layout" id="view-layout" aria-label="Layout"></section>
+      <section class="view" id="view-recap" aria-label="Rekap pesanan"></section>
+      <section class="view" id="view-export" aria-label="Export"></section>
+      <section class="view" id="view-settings" aria-label="Pengaturan"></section>
+    </main>
+  </div>
+</div>
+
+<nav class="bottom-nav" id="bottom-nav" aria-label="Navigasi"></nav>
+<div class="toast-container position-fixed bottom-0 end-0 p-3" id="toasts" style="z-index:2000"></div>
+<input type="file" id="file-photo" accept="image/*" multiple hidden>
+
+<!-- Dialog umum (konfirmasi / input) -->
+<div class="modal fade" id="uiModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+    <div class="modal-header py-2"><h5 class="modal-title" id="ui-title">Konfirmasi</h5></div>
+    <div class="modal-body"><div id="ui-body" style="white-space:pre-line"></div><input class="form-control mt-3 d-none" id="ui-input" type="text"></div>
+    <div class="modal-footer py-2"><button class="btn btn-light" id="ui-cancel">Batal</button><button class="btn btn-primary" id="ui-ok">OK</button></div>
+  </div></div>
+</div>
+
+<!-- Proyek baru -->
+<div class="modal fade" id="projModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+    <div class="modal-header py-2"><h5 class="modal-title">Proyek baru</h5><button class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button></div>
+    <div class="modal-body">
+      <div class="mb-2"><label class="form-label small fw-semibold" for="np-name">Nama proyek</label><input class="form-control" id="np-name" maxlength="80" placeholder="mis. Pas foto SMA 1"></div>
+      <div class="row g-2"><div class="col-sm-7"><label class="form-label small fw-semibold" for="np-customer">Nama pelanggan</label><input class="form-control" id="np-customer" maxlength="80"></div>
+      <div class="col-sm-5"><label class="form-label small fw-semibold" for="np-order">No. order (opsional)</label><input class="form-control" id="np-order" maxlength="40"></div></div>
+      <div class="mt-2"><label class="form-label small fw-semibold" for="np-notes">Catatan</label><textarea class="form-control" id="np-notes" rows="2"></textarea></div>
+      <div class="small text-muted mt-2">Tanggal proyek diisi otomatis.</div>
+    </div>
+    <div class="modal-footer py-2"><button class="btn btn-light" data-bs-dismiss="modal">Batal</button><button class="btn btn-primary" id="np-ok">Buat proyek</button></div>
+  </div></div>
+</div>
+
+<!-- Ukuran custom -->
+<div class="modal fade" id="sizeModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+    <div class="modal-header py-2"><h5 class="modal-title" id="sz-title">Ukuran custom</h5><button class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button></div>
+    <div class="modal-body">
+      <div class="mb-2"><label class="form-label small fw-semibold" for="sz-name">Nama ukuran</label><input class="form-control" id="sz-name" maxlength="24" placeholder="mis. KTP 2.5×3"></div>
+      <div class="row g-2"><div class="col"><label class="form-label small fw-semibold" for="sz-w">Lebar (mm)</label><input class="form-control" id="sz-w" type="number" inputmode="decimal" step="0.1" min="5"></div>
+      <div class="col"><label class="form-label small fw-semibold" for="sz-h">Tinggi (mm)</label><input class="form-control" id="sz-h" type="number" inputmode="decimal" step="0.1" min="5"></div></div>
+      <div class="text-danger small mt-2 d-none" id="sz-err"></div>
+      <div class="small text-muted mt-2">Ukuran disimpan sebagai preset di browser ini dan muncul di dropdown ukuran.</div>
+    </div>
+    <div class="modal-footer py-2"><button class="btn btn-light" data-bs-dismiss="modal">Batal</button><button class="btn btn-primary" id="sz-ok">Simpan preset</button></div>
+  </div></div>
+</div>
+
+<!-- Editor crop -->
+<div class="modal fade" id="cropModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-fullscreen-lg-down"><div class="modal-content">
+    <div class="modal-header py-2"><div><h5 class="modal-title mb-0" id="crop-title">Crop</h5><div class="small text-muted" id="crop-sub"></div></div><button class="btn-close" id="crop-x" aria-label="Tutup"></button></div>
+    <div class="modal-body p-0">
+      <div class="crop-layout">
+        <div class="crop-stage"><canvas id="crop-canvas" aria-label="Area crop"></canvas></div>
+        <div class="crop-side">
+          <div class="text-center">
+            <div class="checker crop-pv"><canvas id="crop-preview"></canvas></div>
+            <div class="small mt-2" id="crop-info"></div>
+          </div>
+          <div class="mt-3">
+            <label class="form-label small fw-semibold mb-0" for="crop-zoom">Zoom <span id="crop-zoomv" class="text-muted"></span></label>
+            <input type="range" class="form-range" id="crop-zoom" min="0.5" max="8" step="0.01" value="1">
+            <div class="d-flex flex-wrap gap-1">
+              <button class="btn btn-sm btn-outline-secondary" data-c="rotate"><i data-lucide="rotate-cw"></i> Putar 90°</button>
+              <button class="btn btn-sm btn-outline-secondary" data-c="flip"><i data-lucide="flip-horizontal"></i> Flip</button>
+              <button class="btn btn-sm btn-outline-secondary" data-c="reset"><i data-lucide="rotate-ccw"></i> Reset</button>
+              <button class="btn btn-sm btn-light" data-c="undo"><i data-lucide="undo-2"></i></button>
+              <button class="btn btn-sm btn-light" data-c="redo"><i data-lucide="redo-2"></i></button>
+            </div>
+            <div class="small text-muted mt-1">Geser foto untuk memosisikan, roda mouse / cubit untuk zoom.</div>
+          </div>
+          <hr>
+          <div class="fw-semibold small mb-1">Latar belakang</div>
+          <div id="crop-bg"></div>
+          <button class="btn btn-sm btn-outline-primary mt-2" data-c="studio"><i data-lucide="wand-2"></i> Studio background…</button>
+          <hr>
+          <div class="fw-semibold small mb-1">Salin crop ke ukuran lain <span class="text-muted fw-normal">(opsional)</span></div>
+          <div id="crop-copy" class="small"></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer py-2"><button class="btn btn-light" id="crop-cancel">Batal</button><button class="btn btn-primary" id="crop-save"><i data-lucide="check"></i> Simpan crop</button></div>
+  </div></div>
+</div>
+
+<!-- Riwayat -->
+<div class="modal fade" id="histModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"><div class="modal-content">
+    <div class="modal-header py-2"><h5 class="modal-title">Riwayat proyek</h5><button class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button></div>
+    <div class="modal-body" id="hist-body"></div>
+  </div></div>
+</div>
+
+<!-- Progres export -->
+<div class="modal fade" id="progModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+    <div class="modal-body">
+      <div class="fw-semibold mb-2" id="prog-title">Memproses…</div>
+      <div class="progress" style="height:10px"><div class="progress-bar" id="prog-bar" style="width:0%"></div></div>
+      <div class="small text-muted mt-2" id="prog-text"></div>
+    </div>
+    <div class="modal-footer py-2"><button class="btn btn-outline-danger btn-sm" id="prog-cancel">Batalkan</button></div>
+  </div></div>
+</div>
+
+<!-- Instruksi print -->
+<div class="modal fade" id="printModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+    <div class="modal-header py-2"><h5 class="modal-title"><i data-lucide="printer"></i> Cetak pada skala 100%</h5><button class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button></div>
+    <div class="modal-body">
+      <p class="mb-2">Agar ukuran foto tepat (mis. 3×4 = 30×40 mm), atur dialog cetak browser:</p>
+      <ol class="mb-2">
+        <li><b>Ukuran kertas</b>: <span id="pr-paper"></span> (sesuai media)</li>
+        <li><b>Skala</b>: pilih <b>100%</b> / Default — <b class="text-danger">JANGAN</b> “Fit to page / Sesuaikan ke halaman”.</li>
+        <li><b>Margin</b>: pilih <b>None / Tidak ada</b>.</li>
+        <li><b>Orientasi</b>: otomatis mengikuti kertas.</li>
+        <li>Aktifkan <b>Background graphics</b> bila tersedia.</li>
+        <li>Di dialog printer (driver), nonaktifkan “Fit/Shrink to printable area”.</li>
+      </ol>
+      <div class="alert alert-warning small mb-0">Setelah mencetak, ukur satu foto dengan penggaris untuk memastikan skala 100%. Untuk hasil paling presisi gunakan Export PDF.</div>
+    </div>
+    <div class="modal-footer py-2"><button class="btn btn-light" data-bs-dismiss="modal">Batal</button><button class="btn btn-primary" id="pr-go"><i data-lucide="printer"></i> Lanjut cetak</button></div>
+  </div></div>
+</div>
+
+<script src="vendor/bootstrap.bundle.min.js"></script>
+<script src="vendor/jspdf.umd.min.js"></script>
+<script src="vendor/lucide.min.js"></script>
+<script src="util.js"></script>
+<script src="config.js"></script>
+<script src="storage.js"></script>
+<script src="layout-engine.js"></script>
+<script src="image-editor.js"></script>
+<script src="bgremoval.js"></script>
+<script src="export.js"></script>
+<script src="layout-view.js"></script>
+<script src="app.js"></script>
+  <script src="../../assets/js/platform.js"></script></body>
+</html>

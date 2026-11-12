@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="id" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>PRINTLAY — Generator ID Card</title>
+  <meta name="description" content="Buat ID Card pegawai dari template asli: isi biodata, unggah foto, unduh PNG/PDF siap cetak. Diproses lokal di browser.">
+  <link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
+  <script>
+    try {
+      var s = JSON.parse(localStorage.getItem('printlay.settings.v1') || 'null');
+      var t = s && s.theme ? s.theme : (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', t);
+    } catch (e) {}
+  </script>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/responsive.css">
+  <link rel="stylesheet" href="assets/css/idcard.css">
+  <link rel="stylesheet" href="../../assets/css/global.css"></head>
+<body>
+  
+
+  <main class="idc">
+    <div class="idc-bar">
+      <label class="idc-type">Pilih Jenis ID Card
+        <select id="typeSel"></select>
+      </label>
+      <div class="idc-tabs" role="tablist">
+        <button type="button" role="tab" id="tabGen" class="tab active" aria-selected="true">Buat ID Card</button>
+        <button type="button" role="tab" id="tabDes" class="tab" aria-selected="false">Template Designer</button>
+      </div>
+      <span id="tplBadge" class="badge neutral">Memuat…</span>
+    </div>
+    <div id="loadError" class="alert error" role="alert" hidden></div>
+
+    <!-- ============ GENERATOR ============ -->
+    <section id="viewGen" class="idc-grid" aria-label="Generator ID Card">
+      <div class="panel">
+        <div id="draftBanner" class="alert warn" hidden></div>
+
+        <div class="card">
+          <h2>A. Form Sisi Depan</h2>
+          <div id="frontFields"></div>
+        </div>
+
+        <div class="card">
+          <h2>B. Form Sisi Belakang</h2>
+          <div id="backFields"></div>
+          <p class="muted small">Alamat kantor, tempat/tanggal dikeluarkan, cap, tanda tangan, dan nama/NIP pejabat sudah menjadi bagian tetap dari template.</p>
+        </div>
+
+        <div class="card">
+          <h2>Status Field</h2>
+          <ul id="statusList" class="idc-status"></ul>
+        </div>
+
+        <div class="card">
+          <h2>Ekspor</h2>
+          <label>Resolusi PNG &amp; PDF
+            <select id="dpiSel">
+              <option value="300">300 dpi</option>
+              <option value="600" selected>600 dpi (disarankan)</option>
+              <option value="1200">1200 dpi</option>
+            </select>
+          </label>
+          <div class="idc-export">
+            <button type="button" class="btn" id="btnPngFront">PNG Depan</button>
+            <button type="button" class="btn" id="btnPngBack">PNG Belakang</button>
+            <button type="button" class="btn primary" id="btnPdfTwo">PDF 2 Halaman</button>
+            <button type="button" class="btn" id="btnPdfOne">PDF 1 Halaman (berdampingan)</button>
+          </div>
+          <div id="exportMsg" class="muted small" role="status"></div>
+          <div class="alert info">
+            Cetak PDF dengan skala <b>Actual Size / 100%</b>, bukan <i>Fit to Page</i>. PDF 2 halaman berukuran tepat 55 × 85 mm per halaman; PDF 1 halaman berukuran 110 × 85 mm (depan di kiri, belakang di kanan).
+          </div>
+        </div>
+      </div>
+
+      <div class="output">
+        <div class="card">
+          <div class="toolbar">
+            <h2>Preview</h2>
+            <div class="toolbar-group">
+              <button type="button" class="icon-btn small" id="zOut" aria-label="Perkecil">−</button>
+              <span class="zoom-label" id="zLabel">100%</span>
+              <button type="button" class="icon-btn small" id="zIn" aria-label="Perbesar">+</button>
+              <button type="button" class="btn small" id="zReset">Reset</button>
+            </div>
+          </div>
+          <div class="toggles">
+            <label class="check"><input type="checkbox" id="showHints" checked> Tampilkan indikator field</label>
+            <button type="button" class="btn small" id="btnEditPos">Edit posisi</button>
+          </div>
+          <div class="idc-previews" id="previews">
+            <figure class="idc-fig">
+              <figcaption>Sisi Depan</figcaption>
+              <div class="idc-stage" id="stageFront"><canvas id="cvFront"></canvas><div class="ov" id="ovFront"></div></div>
+              <div class="idc-warns" id="warnFront"></div>
+            </figure>
+            <figure class="idc-fig">
+              <figcaption>Sisi Belakang</figcaption>
+              <div class="idc-stage" id="stageBack"><canvas id="cvBack"></canvas><div class="ov" id="ovBack"></div></div>
+              <div class="idc-warns" id="warnBack"></div>
+            </figure>
+          </div>
+          <p class="muted small">Seret foto pada preview untuk menggeser, scroll / cubit untuk zoom. Preview memakai fungsi render yang sama dengan PNG dan PDF.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ TEMPLATE DESIGNER ============ -->
+    <section id="viewDes" class="idc-grid" aria-label="Template Designer" hidden>
+      <div class="panel">
+        <div class="card">
+          <h2>Template Designer</h2>
+          <div class="row center">
+            <label class="radio"><input type="radio" name="desSide" value="front" checked> Sisi Depan</label>
+            <label class="radio"><input type="radio" name="desSide" value="back"> Sisi Belakang</label>
+          </div>
+          <p id="desStatus" class="muted small"></p>
+          <div class="row wrap">
+            <button type="button" class="btn small" id="desSave">Simpan (draf)</button>
+            <button type="button" class="btn small primary" id="desApprove">Simpan &amp; Setujui</button>
+            <button type="button" class="btn small" id="desBack">← Kembali ke form</button>
+          </div>
+          <div class="row wrap">
+            <button type="button" class="btn small" id="desUndo">Undo</button>
+            <button type="button" class="btn small" id="desRedo">Redo</button>
+            <button type="button" class="btn small" id="desExport">Unduh JSON</button>
+            <button type="button" class="btn small" id="desImportBtn">Impor JSON</button>
+            <button type="button" class="btn small danger" id="desReset">Reset ke bawaan</button>
+            <input type="file" id="desImport" accept="application/json,.json" multiple hidden>
+          </div>
+          <div id="desAspect" class="alert info" hidden></div>
+        </div>
+
+        <div class="card">
+          <h2>Daftar Field</h2>
+          <ul id="fieldList" class="idc-fields"></ul>
+          <div class="row wrap">
+            <button type="button" class="btn small" id="addText">+ Teks</button>
+            <button type="button" class="btn small" id="addPhoto">+ Foto</button>
+            <button type="button" class="btn small" id="addMask">+ Penutup</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Properti Field</h2>
+          <div id="props"><p class="muted small">Pilih field pada daftar atau pada canvas.</p></div>
+        </div>
+
+        <div class="card">
+          <h2>Pratinjau &amp; Font</h2>
+          <div class="row center">
+            <label class="radio"><input type="radio" name="desData" value="sample" checked> Data contoh</label>
+            <label class="radio"><input type="radio" name="desData" value="form"> Data dari form</label>
+          </div>
+          <label>Foto uji (opsional)
+            <input type="file" id="desPhoto" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp">
+          </label>
+          <label>Unggah font kustom (TTF / OTF / WOFF / WOFF2)
+            <input type="file" id="desFont" accept=".ttf,.otf,.woff,.woff2,font/*">
+          </label>
+          <ul id="fontList" class="idc-fields"></ul>
+          <p class="muted small">Font kustom tersimpan di browser ini dan dipakai preview, PNG, serta PDF. Gunakan agar tampilan teks sama di semua perangkat.</p>
+        </div>
+      </div>
+
+      <div class="output">
+        <div class="card">
+          <div class="toolbar">
+            <h2>Canvas</h2>
+            <div class="toolbar-group">
+              <button type="button" class="icon-btn small" id="dzOut" aria-label="Perkecil">−</button>
+              <span class="zoom-label" id="dzLabel">100%</span>
+              <button type="button" class="icon-btn small" id="dzIn" aria-label="Perbesar">+</button>
+              <button type="button" class="btn small" id="dzFit">Fit</button>
+            </div>
+          </div>
+          <p class="muted small" id="desCoord">Arahkan kursor ke canvas untuk melihat koordinat (mm). Seret kotak untuk menggeser, tarik titik sudut/sisi untuk mengubah ukuran. Panah keyboard menggeser 0,1 mm (Shift = 1 mm).</p>
+          <div class="idc-desk" id="desk" tabindex="0">
+            <div class="idc-stage big" id="desStage"><canvas id="desCanvas"></canvas><div class="ov" id="desOv"></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="assets/js/vendor/jspdf.umd.min.js"></script>
+  <script type="module" src="assets/js/idcard/main.js"></script>
+  <script src="../../assets/js/platform.js"></script></body>
+</html>

@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#172033">
+  <meta name="description" content="Pusat aplikasi Krisna Digital.">
+  <title>KRISNA DIGITAL — Online Tools Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="./assets/css/global.css"></head>
+<body data-theme="dark">
+  <div class="ambient ambient-a"></div><div class="ambient ambient-b"></div>
+  <div class="shell">
+    <main class="main">
+
+      <section class="hero">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="eyebrow-line"></span> KRISNA DIGITAL APP</div>
+          <h1>Semua tools.<br><em>Satu tempat.</em></h1>
+          <p>Selamat datang di pusat aplikasi Krisna Digital. Temukan aplikasi dengan cepat, dan gunakan semuanya dari satu dashboard.</p>
+          <div class="hero-meta"><span class="meta-pulse"></span><span id="heroCount">0 aplikasi terdaftar</span><span class="meta-separator">·</span></div>
+        </div>
+      </section>
+
+      <section class="toolbar">
+        <div class="section-heading"><div><div class="eyebrow muted">APP LIBRARY</div><h2>All applications <span id="resultCount">0</span></h2></div></div>
+        <div class="tools-row">
+          <label class="search-box"><span>⌕</span><input id="searchInput" type="search" placeholder="Cari aplikasi..." autocomplete="off"><kbd>/</kbd></label>
+          <select id="sortSelect" aria-label="Urutkan aplikasi"><option value="featured">Urutan pilihan</option><option value="az">Nama A–Z</option><option value="newest">Terbaru</option></select>
+        </div>
+      </section>
+
+      <section class="apps-grid" id="appsGrid" aria-live="polite"></section>
+      <section class="empty-state" id="emptyState" hidden>
+        <div class="empty-symbol">⌘</div><h3>Belum ada aplikasi di sini</h3>
+        <p>Isi daftar aplikasi di file <code>apps.js</code>. Dashboard akan menampilkannya otomatis.</p>
+      </section>
+      <footer><div class="footer-brand"><span class="brand-mark small"><span></span><span></span><span></span><span></span></span>KRISNA DIGITAL  · 2026</div></footer>
+    </main>
+  </div>
+  <script src="apps.js"></script>
+  <script src="app.js"></script>
+  <script src="./assets/js/platform.js"></script></body>
+</html>

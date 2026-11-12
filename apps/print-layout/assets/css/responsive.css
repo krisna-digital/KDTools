@@ -1,0 +1,22 @@
+@media (max-width: 1000px) {
+  .layout { grid-template-columns: 1fr; padding: 12px; gap: 14px; }
+  .topbar { padding: 10px 14px; }
+}
+
+@media (max-width: 560px) {
+  body { font-size: 15px; }
+  .row { flex-wrap: wrap; }
+  .row > label { flex: 1 1 120px; }
+  .row.four > label { flex: 1 1 70px; }
+  .row.three > label { flex: 1 1 90px; }
+  .hero span { font-size: 46px; }
+  .stats { grid-template-columns: 1fr 1fr; }
+  .btn, .icon-btn { min-height: 44px; }
+  .preview-wrap { padding: 6px; max-height: 70vh; }
+  .brand h1 { font-size: 18px; }
+  .art-row { flex-direction: column; }
+}
+
+@supports (padding: env(safe-area-inset-bottom)) {
+  .footer { padding-bottom: calc(20px + env(safe-area-inset-bottom)); }
+}

@@ -1,0 +1,12 @@
+{
+  "name": "printlay",
+  "version": "1.0.0",
+  "description": "PRINTLAY — Smart Print Layout Calculator (web app statis, tanpa backend)",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/calculator.test.js tests/optimizer.test.js tests/validator.test.js tests/renderer.test.js tests/templates.test.js tests/photos.test.js tests/idcard.test.js tests/batch.test.js",
+    "serve": "python3 -m http.server 8080"
+  },
+  "license": "MIT"
+}

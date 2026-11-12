@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "templateId": "provinsi",
+  "side": "front",
+  "widthMm": 55,
+  "heightMm": 85,
+  "image": "front.jpg",
+  "status": "draft",
+  "note": "Posisi diukur otomatis dari gambar referensi ID Card jadi. Wajib diperiksa dan disetujui di Template Designer.",
+  "fields": [
+    {
+      "id": "foto",
+      "label": "Foto Pegawai",
+      "type": "photo",
+      "source": "foto",
+      "x": 12.69,
+      "y": 28.02,
+      "width": 30.22,
+      "height": 39.84,
+      "cropMode": "cover",
+      "border": {
+        "width": 0,
+        "color": "#000000"
+      }
+    },
+    {
+      "id": "nama_depan",
+      "label": "Nama (depan)",
+      "type": "text",
+      "source": "nama",
+      "prefix": "",
+      "x": 3.74,
+      "y": 69.89,
+      "width": 47.94,
+      "height": 4.05,
+      "fontFamily": "Arial, 'Liberation Sans', Helvetica, sans-serif",
+      "fontSize": 4.48,
+      "minFontSize": 1.8,
+      "maxFontSize": 4.48,
+      "fontWeight": "bold",
+      "color": "#000000",
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "autoFit": true,
+      "wrap": false,
+      "letterSpacing": 0,
+      "hScale": 0.64
+    },
+    {
+      "id": "nip_depan",
+      "label": "NIP (depan)",
+      "type": "text",
+      "source": "nip",
+      "prefix": "NIP. ",
+      "x": 3.74,
+      "y": 74.79,
+      "width": 47.94,
+      "height": 4.05,
+      "fontFamily": "Arial, 'Liberation Sans', Helvetica, sans-serif",
+      "fontSize": 3.54,
+      "minFontSize": 1.8,
+      "maxFontSize": 3.54,
+      "fontWeight": "normal",
+      "color": "#000000",
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "autoFit": true,
+      "wrap": false,
+      "letterSpacing": 0,
+      "hScale": 0.83
+    }
+  ]
+}
