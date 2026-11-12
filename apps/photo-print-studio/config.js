@@ -16,16 +16,17 @@
     // --- Ukuran foto R ---
     { id: '2R', name: '2R', w: 60, h: 90, group: 'Foto R' },
     { id: '3R', name: '3R', w: 89, h: 127, group: 'Foto R' },
-    { id: '4R', name: '4R', w: 102, h: 152, group: 'Foto R' },
-    { id: '5R', name: '5R', w: 127, h: 178, group: 'Foto R' },
+    { id: '4R', name: '4R', w: 100, h: 150, group: 'Foto R' },
+    { id: '5R', name: '5R', w: 127, h: 180, group: 'Foto R' },
     { id: '6R', name: '6R', w: 152, h: 203, group: 'Foto R' },
-    { id: '8R', name: '8R', w: 203, h: 254, group: 'Foto R' },
-    { id: '8R+', name: '8R+', w: 203, h: 305, group: 'Foto R' },
-    { id: '10R', name: '10R', w: 254, h: 305, group: 'Foto R' },
+    { id: '8R', name: '8R', w: 200, h: 250, group: 'Foto R' },
+    { id: '10R', name: '10R', w: 200, h: 250, group: 'Foto R' },
+    { id: '10RW', name: '10RW', w: 200, h: 300, group: 'Foto R' },
   ];
 
   const MEDIA = [
     { id: 'A4', name: 'A4', w: 210, h: 297 },
+    { id: 'F4', name: 'F4', w: 210, h: 330 },
     { id: 'A3', name: 'A3', w: 297, h: 420 },
     { id: 'A3+', name: 'A3+', w: 329, h: 483 },
     { id: 'custom', name: 'Custom', w: 210, h: 297 },

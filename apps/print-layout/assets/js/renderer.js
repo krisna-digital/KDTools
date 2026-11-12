@@ -30,6 +30,7 @@ export function buildSvg(layout, cfg, opts = {}) {
   const hasArt = !!(artwork && href);
   // Template berbingkai (mis. Polaroid): foto mengisi jendela dengan COVER — rasio asli tidak diubah.
   const tpl = cfg.template || null;
+  const isBatchTemplate = !!(tpl && tpl.id === 'photo-batch');
   const photos = tpl && Array.isArray(opts.photos) && opts.photos.length ? opts.photos : null;
   const interactive = !!photos && !!opts.interactive && !exportMode;
   const isRot = (p, ph) => Math.abs(p.w - ph.tpl.cardW) > 1e-6; // kartu foto ini harus diputar agar muat di slot
@@ -73,7 +74,7 @@ export function buildSvg(layout, cfg, opts = {}) {
         const g = placePhoto(ph.tpl.window, ph.pxW, ph.pxH, ph.zoom, ph.ox, ph.oy);
         const slotAttr = interactive ? ` data-slot="${i}"` : '';
         out.push(`<g transform="${slotTr(p, isRot(p, ph))}"><g clip-path="url(#pl-c${i})"><image${slotAttr} x="${n(g.x)}" y="${n(g.y)}" width="${n(g.w)}" height="${n(g.h)}" preserveAspectRatio="none" xlink:href="${esc(ph.href)}"/></g></g>`);
-      } else if (!exportMode) {
+      } else if (!exportMode && !isBatchTemplate) {
         const wp = windowOnPaper(p, tpl.window);
         out.push(`<rect x="${n(wp.x)}" y="${n(wp.y)}" width="${n(wp.w)}" height="${n(wp.h)}" fill="${PLACEHOLDER_COLOR}" fill-opacity="0.45"/>`);
       }

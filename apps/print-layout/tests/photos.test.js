@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { run } from './helpers.js';
-import { buildPolaroid2R, POLAROID_DEFAULTS, placePhoto, mapRect, windowOnPaper, MAX_ZOOM } from '../assets/js/templates.js';
+import { buildPolaroid2R, POLAROID_DEFAULTS, placePhoto, mapRect, windowOnPaper, MAX_ZOOM, buildBatchTemplate } from '../assets/js/templates.js';
 import { computeFit } from '../assets/js/calculator.js';
 import { buildSvg } from '../assets/js/renderer.js';
 
@@ -121,6 +121,23 @@ test('posisi/zoom per foto tercermin di SVG (foto berbeda → geometri berbeda)'
   const imgs = [...svg.matchAll(/<image x="([-\d.]+)" y="([-\d.]+)" width="([\d.]+)" height="([\d.]+)"/g)].map((m) => m.slice(1).map(Number));
   assert.ok(near(imgs[1][2], imgs[0][2] * 2, 1e-3));
   assert.ok(near(imgs[1][0], 4, 1e-3)); // ox=0 → tepi kiri gambar = tepi kiri jendela (x = 4 mm)
+});
+
+test('Foto Kustom: slot kosong tidak tampil placeholder saat foto belum memenuhi kertas', () => {
+  const batch = buildBatchTemplate({ w: 80, h: 59, orientation: 'portrait' }).template;
+  const layout = {
+    count: 4,
+    placements: [
+      { x: 0, y: 0, w: 80, h: 59 },
+      { x: 82, y: 0, w: 80, h: 59 },
+      { x: 0, y: 61, w: 80, h: 59 },
+      { x: 82, y: 61, w: 80, h: 59 },
+    ],
+  };
+  const cfg = { paperW: 210, paperH: 297, margins: { top: 0, right: 0, bottom: 0, left: 0 }, designW: 80, designH: 59, template: batch };
+  const svg = buildSvg(layout, cfg, { mode: 'preview', photos: photos([[3000, 4000, 'portrait'], [4000, 3000, 'landscape']]) });
+  assert.equal(count(svg, /fill="#ADD8E6"/g), 0);
+  assert.equal(count(svg, /<image /g), 2);
 });
 
 test('tanpa photos: perilaku lama tidak berubah (satu placeholder per slot)', () => {
