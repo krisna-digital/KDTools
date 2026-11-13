@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>PHOTO PRINT STUDIO — KRISNA DIGITAL</title>
 <meta name="description" content="Professional Photo Layout & Print Studio — KRISNA DIGITAL">
-<meta name="theme-color" content="#070b14">
+<meta name="theme-color" content="#050a09">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,7 +25,11 @@
   </aside>
 
   <div class="main">
-    <header class="topbar kd-legacy-actions"><button class="btn btn-sm btn-primary" id="btn-save" title="Simpan sekarang (Ctrl+S)"><i data-lucide="save"></i><span class="d-none d-md-inline"> Simpan</span></button></header>
+    <div class="topbar project-bar">
+      <div class="topbar-title"><div class="topbar-project" id="top-project">Proyek</div><div class="small text-muted text-truncate" id="top-sub"></div></div>
+      <span class="save-state" id="save-state" role="status"></span>
+      <button class="btn btn-sm btn-primary" id="btn-save" title="Simpan sekarang (Ctrl+S)"><i data-lucide="save"></i><span class="d-none d-sm-inline"> Simpan</span></button>
+    </div>
 
     <main class="content" id="content">
       <section class="view active" id="view-projects" aria-label="Proyek"></section>
@@ -171,5 +175,7 @@
 <script src="export.js"></script>
 <script src="layout-view.js"></script>
 <script src="app.js"></script>
-  <script src="../../assets/js/platform.js"></script></body>
+<script src="../../apps.js"></script>
+<script src="../../assets/js/platform.js"></script>
+</body>
 </html>

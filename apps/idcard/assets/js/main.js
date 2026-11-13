@@ -260,6 +260,7 @@ function drawOverlay(side, cfg, layout, cssW) {
 
 function renderStatus() {
   const ul = $('statusList');
+  if (!ul) return;
   ul.innerHTML = '';
   const icon = { ok: '✔', empty: '○', shrunk: '▲', overflow: '✖' };
   const seen = new Set();

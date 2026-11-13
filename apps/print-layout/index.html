@@ -1,21 +1,15 @@
 <!doctype html>
-<html lang="id" data-theme="light">
+<html lang="id" data-theme="dark">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>PRINTLAY — Smart Print Layout Calculator</title>
   <meta name="description" content="Hitung jumlah maksimal desain per lembar kertas, lihat simulasi layout dengan garis potong, dan unduh PDF siap cetak. Semua diproses lokal di browser.">
   <link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
-  <script>
-    try {
-      var s = JSON.parse(localStorage.getItem('printlay.settings.v1') || 'null');
-      var t = s && s.theme ? s.theme : (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-      document.documentElement.setAttribute('data-theme', t);
-    } catch (e) {}
-  </script>
   <link rel="stylesheet" href="assets/css/style.css">
   <link rel="stylesheet" href="assets/css/responsive.css">
-  <link rel="stylesheet" href="../../assets/css/global.css"></head>
+  <link rel="stylesheet" href="../../assets/css/global.css">
+</head>
 <body>
   
 
@@ -35,7 +29,10 @@
       <div id="formErrors" class="alert error" role="alert" hidden></div>
 
       <div class="card">
-        <h2>Template</h2>
+        <div class="toolbar">
+          <h2>Template</h2>
+          <button type="button" class="btn small" id="settingsBtn" aria-label="Pengaturan" title="Pengaturan">⚙ Pengaturan</button>
+        </div>
         <label>Jenis
           <select id="templateSel">
             <option value="std">Standar (1 desain, ukuran bebas)</option>
@@ -243,5 +240,7 @@
 
   <script src="assets/js/vendor/jspdf.umd.min.js"></script>
   <script type="module" src="assets/js/app.js"></script>
-  <script src="../../assets/js/platform.js"></script></body>
+  <script src="../../apps.js"></script>
+  <script src="../../assets/js/platform.js"></script>
+</body>
 </html>

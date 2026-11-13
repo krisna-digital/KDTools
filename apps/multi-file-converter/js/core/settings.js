@@ -50,7 +50,6 @@ export function effectiveConcurrency(heavy) {
 }
 
 export function applyTheme() {
-  const t = prefs.theme;
-  const dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
-  document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+  // Platform KRISNA DIGITAL selalu memakai dark mode.
+  document.documentElement.dataset.theme = 'dark';
 }

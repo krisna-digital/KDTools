@@ -1,13 +1,12 @@
-// App shell: sidebar, hash router, theme.
+// App shell: sidebar, hash router. Theme is always dark (platform KRISNA DIGITAL).
 
 import { h, icon, clear } from './ui/dom.js';
-import { applyTheme, getPref, setPref } from './core/settings.js';
+import { applyTheme } from './core/settings.js';
 import { getTool, CATEGORIES } from './registry.js';
 import { renderHome, renderCategory, renderAll, renderSettingsPage, renderAbout } from './ui/pages.js';
 import { cleanupAll } from './core/cleanup.js';
 
 applyTheme();
-matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', applyTheme);
 
 const NAV = [
   ['', 'Home', 'home'],
@@ -23,17 +22,11 @@ const sidebar = h('aside', { class: 'sidebar', id: 'sidebar', 'aria-label': 'Mai
   h('nav', null, NAV.map(([id, label, ic]) => h('a', { class: 'nav-item', href: `#/${id}`, dataset: { nav: id } }, icon(ic, 20), h('span', null, label)))),
   h('div', { class: 'side-foot' }, icon('lock', 14), h('span', null, 'Files never leave your device')),
 );
-const themeBtn = h('button', { class: 'icon-btn', type: 'button', 'aria-label': 'Toggle light/dark theme', onclick: () => {
-  const dark = document.documentElement.dataset.theme === 'dark';
-  setPref('theme', dark ? 'light' : 'dark'); applyTheme(); syncThemeIcon();
-} });
-function syncThemeIcon() { clear(themeBtn); themeBtn.append(icon(document.documentElement.dataset.theme === 'dark' ? 'sun' : 'moon', 20)); }
 const menuBtn = h('button', { class: 'icon-btn menu-btn', type: 'button', 'aria-label': 'Open menu', 'aria-controls': 'sidebar', onclick: () => document.body.classList.toggle('nav-open') }, icon('menu', 22));
-const topbar = h('header', { class: 'topbar' }, menuBtn, h('a', { class: 'brand-mini', href: '#/' }, 'Multi File Converter'), h('div', { class: 'spacer' }), themeBtn);
+const topbar = h('header', { class: 'topbar' }, menuBtn, h('a', { class: 'brand-mini', href: '#/' }, 'Multi File Converter'));
 const view = h('main', { class: 'view', id: 'view', tabindex: '-1' });
 const scrim = h('div', { class: 'scrim', onclick: () => document.body.classList.remove('nav-open') });
 app.append(sidebar, scrim, h('div', { class: 'main-col' }, topbar, view));
-syncThemeIcon();
 
 let unmount = null;
 

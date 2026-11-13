@@ -1,22 +1,16 @@
 <!doctype html>
-<html lang="id" data-theme="light">
+<html lang="id" data-theme="dark">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>ID Card Studio — KRISNA DIGITAL</title>
   <meta name="description" content="ID Card Studio: buat ID Card pegawai dari template asli — isi biodata, unggah foto, unduh PNG/PDF siap cetak. Diproses lokal di browser.">
   <link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
-  <script>
-    try {
-      var s = JSON.parse(localStorage.getItem('idcardstudio.settings.v1') || 'null');
-      var t = s && s.theme ? s.theme : (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-      document.documentElement.setAttribute('data-theme', t);
-    } catch (e) {}
-  </script>
   <link rel="stylesheet" href="assets/css/base.css">
   <link rel="stylesheet" href="assets/css/responsive.css">
   <link rel="stylesheet" href="assets/css/studio.css">
-  <link rel="stylesheet" href="../../assets/css/global.css"></head>
+  <link rel="stylesheet" href="../../assets/css/global.css">
+</head>
 <body>
   
 
@@ -183,5 +177,7 @@
 
   <script src="assets/js/vendor/jspdf.umd.min.js"></script>
   <script type="module" src="assets/js/main.js"></script>
-  <script src="../../assets/js/platform.js"></script></body>
+  <script src="../../apps.js"></script>
+  <script src="../../assets/js/platform.js"></script>
+</body>
 </html>

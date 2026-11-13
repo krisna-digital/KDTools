@@ -83,8 +83,6 @@ export function renderAll(root) {
 }
 
 export function renderSettingsPage(root) {
-  const themeSel = h('select', { id: 'pref-theme', onchange: (e) => { setPref('theme', e.target.value); applyTheme(); } },
-    [['system', 'Follow system'], ['light', 'Light'], ['dark', 'Dark']].map(([v, l]) => h('option', { value: v, selected: getPref('theme') === v }, l)));
   const conc = h('select', { id: 'pref-conc', onchange: (e) => setPref('concurrency', Number(e.target.value)) },
     [[0, 'Automatic (recommended)'], [1, '1 file at a time (lowest memory)'], [2, '2 files at a time'], [3, '3 files at a time'], [4, '4 files at a time']].map(([v, l]) => h('option', { value: v, selected: getPref('concurrency') === v }, l)));
   const mode = h('select', { id: 'pref-mode', onchange: (e) => setPref('settingsMode', e.target.value) },
@@ -93,7 +91,6 @@ export function renderSettingsPage(root) {
   root.append(
     h('header', { class: 'tool-head' }, h('h1', null, 'Settings'), h('p', { class: 'lead' }, 'Preferences are stored only in your browser (localStorage). No file data is ever saved.')),
     h('div', { class: 'card form' },
-      h('div', { class: 'field' }, h('label', { for: 'pref-theme' }, 'Theme'), themeSel),
       h('div', { class: 'field' }, h('label', { for: 'pref-mode' }, 'Default settings mode'), mode),
       h('div', { class: 'field' }, h('label', { for: 'pref-conc' }, 'Parallel conversions'), conc, h('small', null, 'Video and audio conversions always run one at a time to protect browser memory.')),
       h('div', { class: 'field field-check' }, h('label', { for: 'pref-rel' }, rel, h('span', null, 'Release a result from memory right after it was downloaded')), h('small', null, 'Recommended. Converted files are never kept longer than needed; turn this off if you want to download the same result more than once.')),
